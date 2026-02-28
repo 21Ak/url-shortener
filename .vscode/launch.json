@@ -1,0 +1,14 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        
+        {
+            "type": "java",
+            "name": "URL Shortener",
+            "request": "launch",
+            "mainClass": "com.urlshortener.UrlShortenerApplication",
+            "projectName": "url-shortener",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}

@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Shortener — Requirements &amp; Design Document</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        :root {
+            --bg: #ffffff;
+            --text: #1a1a2e;
+            --text-secondary: #555770;
+            --accent: #4f46e5;
+            --accent-light: #eef2ff;
+            --border: #e2e8f0;
+            --code-bg: #f8fafc;
+            --tag-p0: #dc2626;
+            --tag-p1: #ea580c;
+            --tag-p2: #2563eb;
+            --success: #16a34a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--text);
+            line-height: 1.7;
+            background: var(--bg);
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 48px 32px;
+        }
+
+        /* Header */
+        .doc-header {
+            border-bottom: 3px solid var(--accent);
+            padding-bottom: 24px;
+            margin-bottom: 40px;
+        }
+
+        .doc-header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 4px;
+        }
+
+        .doc-header .subtitle {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .doc-header .meta {
+            margin-top: 12px;
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+        }
+
+        /* Sections */
+        h2 {
+            font-size: 1.35rem;
+            font-weight: 700;
+            margin-top: 40px;
+            margin-bottom: 16px;
+            color: var(--text);
+            padding-bottom: 6px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        h3 {
+            font-size: 1.05rem;
+            font-weight: 600;
+            margin-top: 24px;
+            margin-bottom: 10px;
+            color: var(--text);
+        }
+
+        p {
+            margin-bottom: 12px;
+        }
+
+        strong {
+            font-weight: 600;
+        }
+
+        /* Lists */
+        ul,
+        ol {
+            padding-left: 24px;
+            margin-bottom: 12px;
+        }
+
+        li {
+            margin-bottom: 6px;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0 24px;
+            font-size: 0.9rem;
+        }
+
+        thead th {
+            background: var(--accent);
+            color: #fff;
+            font-weight: 600;
+            padding: 10px 14px;
+            text-align: left;
+        }
+
+        thead th:first-child {
+            border-radius: 6px 0 0 0;
+        }
+
+        thead th:last-child {
+            border-radius: 0 6px 0 0;
+        }
+
+        tbody td {
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        tbody tr:nth-child(even) {
+            background: #f8fafc;
+        }
+
+        tbody tr:hover {
+            background: var(--accent-light);
+        }
+
+        /* Priority Tags */
+        .tag {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .tag-p0 {
+            background: var(--tag-p0);
+        }
+
+        .tag-p1 {
+            background: var(--tag-p1);
+        }
+
+        .tag-p2 {
+            background: var(--tag-p2);
+        }
+
+        /* Code */
+        code {
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            background: var(--code-bg);
+            border: 1px solid var(--border);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+        }
+
+        pre {
+            background: #1e1e2e;
+            color: #cdd6f4;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 12px 0 20px;
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+
+        pre code {
+            background: none;
+            border: none;
+            padding: 0;
+            color: inherit;
+        }
+
+        .json-key {
+            color: #89b4fa;
+        }
+
+        .json-string {
+            color: #a6e3a1;
+        }
+
+        /* Callout */
+        .callout {
+            background: var(--accent-light);
+            border-left: 4px solid var(--accent);
+            padding: 14px 18px;
+            border-radius: 0 8px 8px 0;
+            margin: 20px 0;
+            font-size: 0.92rem;
+        }
+
+        /* Separator */
+        hr {
+            border: none;
+            border-top: 2px solid var(--border);
+            margin: 36px 0;
+        }
+
+        /* API Endpoint badge */
+        .endpoint {
+            display: inline-block;
+            font-family: 'SF Mono', monospace;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .method {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 4px;
+            color: #fff;
+            font-size: 0.78rem;
+            font-weight: 700;
+            margin-right: 8px;
+        }
+
+        .method-post {
+            background: var(--success);
+        }
+
+        .method-get {
+            background: var(--tag-p2);
+        }
+
+        /* Phase table special styling */
+        .phase-label {
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        /* Print styles */
+        @media print {
+            body {
+                padding: 24px;
+                font-size: 11pt;
+            }
+
+            .doc-header {
+                border-bottom-width: 2px;
+            }
+
+            pre {
+                background: #f5f5f5 !important;
+                color: #333 !important;
+                border: 1px solid #ddd;
+            }
+
+            thead th {
+                background: #333 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .tag,
+            .method {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            tbody tr:hover {
+                background: transparent;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- HEADER -->
+    <div class="doc-header">
+        <h1>🔗 URL Shortener</h1>
+        <div class="subtitle">Requirements &amp; Design Document</div>
+        <div class="meta">Version 1.0 &nbsp;·&nbsp; February 28, 2026 &nbsp;·&nbsp; Weekend Project — System Design
+            Practice</div>
+    </div>
+
+    <!-- PROBLEM -->
+    <h2>🎯 The Problem</h2>
+    <p>Users share links all the time — in tweets, messages, emails, presentations. Long URLs are ugly, hard to
+        remember, break when copy-pasted, and provide zero insight into who's clicking them.</p>
+    <p><strong>A URL shortener solves this by:</strong></p>
+    <ol>
+        <li>Converting a long URL into a short, shareable link</li>
+        <li>Redirecting anyone who visits the short link to the original URL</li>
+        <li>Optionally tracking how that link is being used</li>
+    </ol>
+
+    <hr>
+
+    <!-- USER STORIES -->
+    <h2>👤 User Stories</h2>
+    <p><strong>As a user, I want to…</strong></p>
+    <table>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>User Story</th>
+                <th>Priority</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td>Paste a long URL and get a short link back</td>
+                <td><span class="tag tag-p0">P0</span></td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>Click a short link and be redirected to the original URL</td>
+                <td><span class="tag tag-p0">P0</span></td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>Get a meaningful error if the short link doesn't exist or is invalid</td>
+                <td><span class="tag tag-p0">P0</span></td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td>Set an expiry time on my short link</td>
+                <td><span class="tag tag-p1">P1</span></td>
+            </tr>
+            <tr>
+                <td>5</td>
+                <td>See how many times my link was clicked (basic analytics)</td>
+                <td><span class="tag tag-p1">P1</span></td>
+            </tr>
+            <tr>
+                <td>6</td>
+                <td>Provide a custom alias (e.g., <code>/my-portfolio</code>) instead of a random code</td>
+                <td><span class="tag tag-p1">P1</span></td>
+            </tr>
+            <tr>
+                <td>7</td>
+                <td>See the top referrers and geographic breakdown of clicks</td>
+                <td><span class="tag tag-p2">P2</span></td>
+            </tr>
+            <tr>
+                <td>8</td>
+                <td>Manage (list, update, delete) my shortened links via a dashboard</td>
+                <td><span class="tag tag-p2">P2</span></td>
+            </tr>
+            <tr>
+                <td>9</td>
+                <td>Be protected from being redirected to malicious/phishing URLs</td>
+                <td><span class="tag tag-p2">P2</span></td>
+            </tr>
+            <tr>
+                <td>10</td>
+                <td>Have my links work reliably even under heavy traffic</td>
+                <td><span class="tag tag-p2">P2</span></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <hr>
+
+    <!-- P0 -->
+    <h2>P0 — Must-Have (Core MVP)</h2>
+    <p>These are the <strong>non-negotiable</strong> features. Without these, the product doesn't exist.</p>
+
+    <h3>1. Shorten a URL</h3>
+    <ul>
+        <li><strong>Input:</strong> A valid long URL (e.g., <code>https://example.com/very/long/path?with=params</code>)
+        </li>
+        <li><strong>Output:</strong> A short URL (e.g., <code>http://localhost:3000/abc123</code>)</li>
+        <li><strong>Rules:</strong>
+            <ul>
+                <li>Validate that the input is a well-formed URL</li>
+                <li>Generate a unique, short code (6–8 characters)</li>
+                <li>Persist the mapping (short code → long URL) in a database</li>
+                <li>Return the full short URL to the user</li>
+            </ul>
+        </li>
+    </ul>
+
+    <h3>2. Redirect to Original URL</h3>
+    <ul>
+        <li><strong>Input:</strong> A short code via <code>GET /:shortCode</code></li>
+        <li><strong>Output:</strong> <code>HTTP 301/302</code> redirect to the original long URL</li>
+        <li><strong>Rules:</strong>
+            <ul>
+                <li>Look up the short code in the database</li>
+                <li>If found → redirect</li>
+                <li>If not found → return <code>404 Not Found</code> with a clear error message</li>
+            </ul>
+        </li>
+    </ul>
+
+    <h3>3. Error Handling</h3>
+    <ul>
+        <li><strong>Invalid URL submitted</strong> → <code>400 Bad Request</code> with validation message</li>
+        <li><strong>Short code not found</strong> → <code>404 Not Found</code></li>
+        <li><strong>Duplicate short code (collision)</strong> → Retry with a new code (transparent to user)</li>
+        <li><strong>Server errors</strong> → <code>500 Internal Server Error</code> with a generic safe message (no
+            stack traces leaked)</li>
+    </ul>
+
+    <hr>
+
+    <!-- P1 -->
+    <h2>P1 — Should-Have (Next Iteration)</h2>
+    <p>These add real value and make the product <em>useful</em> beyond a toy.</p>
+
+    <h3>4. Link Expiry (TTL)</h3>
+    <ul>
+        <li>User can optionally set an expiry duration (e.g., 24h, 7d, 30d)</li>
+        <li>Expired links return <code>410 Gone</code></li>
+        <li>Background cleanup job removes expired entries</li>
+    </ul>
+
+    <h3>5. Basic Click Analytics</h3>
+    <ul>
+        <li>Every redirect increments a click counter</li>
+        <li>API endpoint to get click count for a given short code</li>
+        <li>Track: timestamp, user-agent, referer header (stored asynchronously to not slow down redirects)</li>
+    </ul>
+
+    <h3>6. Custom Aliases</h3>
+    <ul>
+        <li>User can optionally provide a custom short code (e.g., <code>my-portfolio</code>)</li>
+        <li>Validate: alphanumeric + hyphens, 3–30 chars, not already taken</li>
+        <li>If taken → return <code>409 Conflict</code></li>
+    </ul>
+
+    <hr>
+
+    <!-- P2 -->
+    <h2>P2 — Nice-to-Have (Future Scope)</h2>
+    <p>These make the product <em>competitive</em> but are not essential for learning.</p>
+
+    <h3>7. Rich Analytics Dashboard</h3>
+    <ul>
+        <li>Click trends over time (hourly/daily)</li>
+        <li>Top referrers, browser breakdown, device type, geo (via IP lookup)</li>
+    </ul>
+
+    <h3>8. Link Management (CRUD)</h3>
+    <ul>
+        <li>User authentication (simple API key or JWT)</li>
+        <li>List all my links, update destination, delete a link</li>
+    </ul>
+
+    <h3>9. URL Safety Check</h3>
+    <ul>
+        <li>Before creating a short link, check the URL against a blocklist or a safe browsing API</li>
+        <li>Flag/block known malicious URLs</li>
+    </ul>
+
+    <h3>10. Rate Limiting</h3>
+    <ul>
+        <li>Prevent abuse: limit link creation to N per minute per IP</li>
+        <li>Limit redirects per short code to prevent DDoS amplification</li>
+    </ul>
+
+    <hr>
+
+    <!-- API CONTRACT -->
+    <h2>📐 API Contract (P0 Scope)</h2>
+
+    <h3>
+        <span class="method method-post">POST</span>
+        <span class="endpoint">/api/shorten</span>
+    </h3>
+    <p><strong>Request:</strong></p>
+    <pre><code>{
+  <span class="json-key">"url"</span>: <span class="json-string">"https://example.com/very/long/path?with=params"</span>
+}</code></pre>
+
+    <p><strong>Success Response (201 Created):</strong></p>
+    <pre><code>{
+  <span class="json-key">"shortCode"</span>: <span class="json-string">"abc123"</span>,
+  <span class="json-key">"shortUrl"</span>: <span class="json-string">"http://localhost:3000/abc123"</span>,
+  <span class="json-key">"originalUrl"</span>: <span class="json-string">"https://example.com/very/long/path?with=params"</span>,
+  <span class="json-key">"createdAt"</span>: <span class="json-string">"2026-02-28T03:09:00Z"</span>
+}</code></pre>
+
+    <p><strong>Error Response (400 Bad Request):</strong></p>
+    <pre><code>{
+  <span class="json-key">"error"</span>: <span class="json-string">"INVALID_URL"</span>,
+  <span class="json-key">"message"</span>: <span class="json-string">"The provided URL is not valid."</span>
+}</code></pre>
+
+    <hr>
+
+    <h3>
+        <span class="method method-get">GET</span>
+        <span class="endpoint">/:shortCode</span>
+    </h3>
+    <p><strong>Success:</strong> <code>301 Redirect</code> to original URL (with <code>Location</code> header)</p>
+    <p><strong>Error (404 Not Found):</strong></p>
+    <pre><code>{
+  <span class="json-key">"error"</span>: <span class="json-string">"NOT_FOUND"</span>,
+  <span class="json-key">"message"</span>: <span class="json-string">"Short link not found."</span>
+}</code></pre>
+
+    <hr>
+
+    <!-- DESIGN DECISIONS -->
+    <h2>⚖️ Key Design Decisions</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Decision</th>
+                <th>Options</th>
+                <th>Recommendation</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Short code generation</strong></td>
+                <td>Random vs Counter-based vs Hash-based</td>
+                <td>Hash-based (MD5/SHA → Base62 first 7 chars) with collision retry</td>
+            </tr>
+            <tr>
+                <td><strong>Redirect status code</strong></td>
+                <td>301 (permanent) vs 302 (temporary)</td>
+                <td>302 — allows analytics tracking; 301 gets cached by browsers</td>
+            </tr>
+            <tr>
+                <td><strong>Language / Framework</strong></td>
+                <td>Java, Python, Node.js, Go</td>
+                <td><em>To be decided</em></td>
+            </tr>
+            <tr>
+                <td><strong>Database</strong></td>
+                <td>PostgreSQL, SQLite, MongoDB</td>
+                <td>PostgreSQL (relational design) or SQLite (simplicity)</td>
+            </tr>
+            <tr>
+                <td><strong>Architecture</strong></td>
+                <td>Monolith layered</td>
+                <td>Clean layered — Controller → Service → Repository</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <hr>
+
+    <!-- BUILD PLAN -->
+    <h2>🚀 Proposed Build Plan</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Phase</th>
+                <th>What</th>
+                <th>Design Patterns &amp; Focus</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><span class="phase-label">Phase 1</span></td>
+                <td>P0 core — shorten + redirect + errors</td>
+                <td>Layered architecture, Strategy pattern, Repository pattern, error handling</td>
+            </tr>
+            <tr>
+                <td><span class="phase-label">Phase 2</span></td>
+                <td>P1 features — expiry, analytics, custom alias</td>
+                <td>Observer pattern, background jobs, input validation</td>
+            </tr>
+            <tr>
+                <td><span class="phase-label">Phase 3</span></td>
+                <td>P2 features — dashboard, rate limiting</td>
+                <td>Middleware pattern, auth, advanced patterns</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="callout">
+        <strong>🎯 Weekend Goal:</strong> Build <strong>Phase 1</strong> this weekend, with the architecture designed to
+        cleanly support Phase 2 and 3 later thanks to proper abstractions.
+    </div>
+
+</body>
+
+</html>

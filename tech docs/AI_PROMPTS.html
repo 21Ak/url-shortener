@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Shortener — AI Prompts for Each Build Chunk</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+        :root {
+            --bg: #0f172a;
+            --surface: #1e293b;
+            --border: #334155;
+            --text: #e2e8f0;
+            --text-dim: #94a3b8;
+            --accent: #818cf8;
+            --amber: #fbbf24;
+            --green: #34d399;
+            --cyan: #22d3ee;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            padding: 0;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #1e1b4b, #0f172a, #0c1a2e);
+            border-bottom: 1px solid var(--border);
+            padding: 40px 32px;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--amber), #f97316);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 6px;
+        }
+
+        .hero .sub {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 32px;
+        }
+
+        .chunk-prompt {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+
+        .chunk-prompt:hover {
+            border-color: var(--amber);
+        }
+
+        .cp-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .cp-header:hover {
+            background: rgba(251, 191, 36, 0.05);
+        }
+
+        .cp-num {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 0.9rem;
+            background: rgba(251, 191, 36, 0.15);
+            color: var(--amber);
+            flex-shrink: 0;
+        }
+
+        .cp-title {
+            flex: 1;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .cp-arrow {
+            color: var(--amber);
+            font-size: 0.8rem;
+            transition: transform 0.2s;
+        }
+
+        .cp-body {
+            display: none;
+            padding: 0;
+        }
+
+        .cp-body.open {
+            display: block;
+        }
+
+        .prompt-box {
+            position: relative;
+        }
+
+        .prompt-text {
+            padding: 20px;
+            font-size: 0.82rem;
+            line-height: 1.8;
+            color: #cbd5e1;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            background: #0c0f1a;
+            font-family: 'SF Mono', 'Fira Code', monospace;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: rgba(251, 191, 36, 0.15);
+            border: 1px solid rgba(251, 191, 36, 0.3);
+            color: var(--amber);
+            padding: 5px 14px;
+            border-radius: 5px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .copy-btn:hover {
+            background: rgba(251, 191, 36, 0.3);
+        }
+
+        .copy-btn.copied {
+            background: rgba(52, 211, 153, 0.2);
+            border-color: rgba(52, 211, 153, 0.3);
+            color: var(--green);
+        }
+
+        .note {
+            background: rgba(129, 140, 248, 0.08);
+            border: 1px solid rgba(129, 140, 248, 0.15);
+            border-radius: 8px;
+            padding: 14px 18px;
+            margin-bottom: 24px;
+            font-size: 0.85rem;
+            color: var(--text-dim);
+        }
+
+        .note strong {
+            color: var(--accent);
+        }
+
+        @media print {
+            body {
+                background: #fff;
+                color: #333;
+            }
+
+            .hero {
+                background: #f8f8f8;
+            }
+
+            .hero h1 {
+                -webkit-text-fill-color: #d97706;
+            }
+
+            .chunk-prompt {
+                border: 1px solid #ddd;
+            }
+
+            .prompt-text {
+                background: #f5f5f5;
+                color: #333;
+            }
+
+            .cp-body {
+                display: block !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="hero">
+        <h1>🤖 AI Prompts — URL Shortener Build</h1>
+        <div class="sub">Copy-paste these into any AI assistant to build each chunk</div>
+    </div>
+    <div class="container">
+        <div class="note">
+            <strong>How to use:</strong> Click any chunk to expand it. Click "Copy" to copy the prompt. Paste it into
+            your AI coding assistant. Each prompt builds exactly one chunk and includes all context needed — no prior
+            reading required.
+        </div>
+
+        <!-- CHUNK 1 -->
+        <div class="chunk-prompt">
+            <div class="cp-header" onclick="toggle(this)">
+                <div class="cp-num">1</div>
+                <div class="cp-title">Project Setup & Skeleton</div>
+                <span class="cp-arrow">▶</span>
+            </div>
+            <div class="cp-body">
+                <div class="prompt-box">
+                    <button class="copy-btn" onclick="copyText(this)">Copy</button>
+                    <div class="prompt-text">I am building a URL Shortener service using Java 17+ and Spring Boot 3.x
+                        with Maven.
+
+                        TASK: Initialize the Spring Boot project skeleton. Do NOT create any business logic classes yet
+                        — only the skeleton.
+
+                        PROJECT LOCATION: Create the project in the current directory.
+
+                        1. Create pom.xml:
+                        - groupId: com.urlshortener, artifactId: url-shortener
+                        - Java 17 source/target
+                        - Spring Boot 3.x parent (use latest stable)
+                        - Dependencies: spring-boot-starter-web, spring-boot-starter-data-jpa, postgresql (runtime),
+                        spring-boot-starter-validation, spring-boot-starter-test (test), lombok (optional)
+
+                        2. Create src/main/java/com/urlshortener/UrlShortenerApplication.java:
+                        - @SpringBootApplication annotation
+                        - Standard main() with SpringApplication.run()
+
+                        3. Create src/main/resources/application.yml:
+                        server:
+                        port: 8080
+                        spring:
+                        datasource:
+                        url: jdbc:postgresql://localhost:5432/urlshortener
+                        username: postgres
+                        password: postgres
+                        jpa:
+                        hibernate:
+                        ddl-auto: update
+                        show-sql: true
+                        properties:
+                        hibernate:
+                        format_sql: true
+                        app:
+                        base-url: http://localhost:8080
+
+                        4. Create empty package directories under src/main/java/com/urlshortener/ for:
+                        controller, service, helper, transformer, repository, entity, model/request, model/response,
+                        exception, config
+                        (Add a package-info.java in each so they are tracked by git)
+
+                        VERIFICATION: "mvn clean compile" should succeed with no errors.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CHUNK 2 -->
+        <div class="chunk-prompt">
+            <div class="cp-header" onclick="toggle(this)">
+                <div class="cp-num">2</div>
+                <div class="cp-title">Database Setup & Entity</div>
+                <span class="cp-arrow">▶</span>
+            </div>
+            <div class="cp-body">
+                <div class="prompt-box">
+                    <button class="copy-btn" onclick="copyText(this)">Copy</button>
+                    <div class="prompt-text">I am building a URL Shortener with Java 17 + Spring Boot 3.x + PostgreSQL.
+                        The project skeleton is already set up with package base com.urlshortener.
+
+                        TASK: Create the database schema file and the JPA entity. Do NOT create any other classes.
+
+                        1. Create src/main/resources/schema.sql:
+
+                        CREATE TABLE IF NOT EXISTS url_mappings (
+                        id BIGSERIAL PRIMARY KEY,
+                        short_code VARCHAR(10) NOT NULL UNIQUE,
+                        original_url TEXT NOT NULL,
+                        created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+                        expires_at TIMESTAMP NULL,
+                        click_count BIGINT NOT NULL DEFAULT 0
+                        );
+                        CREATE INDEX IF NOT EXISTS idx_short_code ON url_mappings (short_code);
+                        CREATE INDEX IF NOT EXISTS idx_expires_at ON url_mappings (expires_at) WHERE expires_at IS NOT
+                        NULL;
+
+                        2. Create src/main/java/com/urlshortener/entity/UrlMapping.java:
+                        - @Entity, @Table(name = "url_mappings")
+                        - id: Long — @Id, @GeneratedValue(strategy = GenerationType.IDENTITY)
+                        - shortCode: String — @Column(name="short_code", nullable=false, unique=true, length=10)
+                        - originalUrl: String — @Column(name="original_url", nullable=false, columnDefinition="TEXT")
+                        - createdAt: LocalDateTime — @Column(name="created_at", nullable=false, updatable=false)
+                        - expiresAt: LocalDateTime — @Column(name="expires_at"), nullable (P1-ready, unused for now)
+                        - clickCount: Long — @Column(name="click_count", nullable=false), initialize to 0L (P1-ready)
+                        - Add @PrePersist method: sets this.createdAt = LocalDateTime.now()
+                        - Generate: no-arg constructor, all getters and setters
+
+                        3. Add to application.yml: spring.sql.init.mode: always
+
+                        VERIFICATION: "mvn spring-boot:run" should start successfully and Hibernate should log the
+                        url_mappings table.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CHUNK 3 -->
+        <div class="chunk-prompt">
+            <div class="cp-header" onclick="toggle(this)">
+                <div class="cp-num">3</div>
+                <div class="cp-title">Repository Layer</div>
+                <span class="cp-arrow">▶</span>
+            </div>
+            <div class="cp-body">
+                <div class="prompt-box">
+                    <button class="copy-btn" onclick="copyText(this)">Copy</button>
+                    <div class="prompt-text">I am building a URL Shortener with Java 17 + Spring Boot 3.x. The entity
+                        UrlMapping already exists in com.urlshortener.entity.
+
+                        TASK: Create the Spring Data JPA repository interface and its unit tests.
+
+                        1. Create src/main/java/com/urlshortener/repository/UrlMappingRepository.java:
+                        - Interface extending JpaRepository&lt;UrlMapping, Long&gt;
+                        - Add: Optional&lt;UrlMapping&gt; findByShortCode(String shortCode);
+                        - Add: boolean existsByShortCode(String shortCode);
+
+                        2. Create src/test/java/com/urlshortener/repository/UrlMappingRepositoryTest.java:
+                        - Use @DataJpaTest annotation (auto-configures in-memory DB for testing)
+                        - @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY) to use H2 for
+                        tests
+                        - Add H2 dependency in pom.xml under test scope if not present
+                        - Inject UrlMappingRepository via @Autowired
+
+                        Write these 3 test methods:
+
+                        Test 1 — testFindByShortCode_Found:
+                        - Create a UrlMapping with shortCode="abc1234", originalUrl="https://google.com"
+                        - Save it via repository.save()
+                        - Call repository.findByShortCode("abc1234")
+                        - Assert it returns a present Optional with correct originalUrl
+
+                        Test 2 — testFindByShortCode_NotFound:
+                        - Call repository.findByShortCode("nonexistent")
+                        - Assert it returns an empty Optional
+
+                        Test 3 — testExistsByShortCode:
+                        - Save a UrlMapping with shortCode="test123"
+                        - Assert repository.existsByShortCode("test123") returns true
+                        - Assert repository.existsByShortCode("nope456") returns false
+
+                        VERIFICATION: "mvn test -Dtest=UrlMappingRepositoryTest" — all 3 tests should pass.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CHUNK 4 -->
+        <div class="chunk-prompt">
+            <div class="cp-header" onclick="toggle(this)">
+                <div class="cp-num">4</div>
+                <div class="cp-title">Models (Request & Response DTOs)</div>
+                <span class="cp-arrow">▶</span>
+            </div>
+            <div class="cp-body">
+                <div class="prompt-box">
+                    <button class="copy-btn" onclick="copyText(this)">Copy</button>
+                    <div class="prompt-text">I am building a URL Shortener with Java 17 + Spring Boot 3.x.
+
+                        TASK: Create the request/response model DTOs and validation tests.
+
+                        1. Create src/main/java/com/urlshortener/model/request/ShortenUrlRequest.java:
+                        - Use Java record type
+                        - Single field: String url
+                        - Annotate url with @NotBlank(message = "URL cannot be empty")
+                        - Annotate url with @org.hibernate.validator.constraints.URL(message = "The provided URL is not
+                        valid")
+                        - Import from jakarta.validation.constraints for @NotBlank
+
+                        2. Create src/main/java/com/urlshortener/model/response/ShortenUrlResponse.java:
+                        - Java record with fields: String shortCode, String shortUrl, String originalUrl, LocalDateTime
+                        createdAt
+
+                        3. Create src/main/java/com/urlshortener/model/response/ErrorResponse.java:
+                        - Java record with fields: String error, String message, int status
+
+                        4. Create src/test/java/com/urlshortener/model/ShortenUrlRequestTest.java:
+                        - Use Jakarta Validator programmatically:
+                        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+                        Validator validator = factory.getValidator();
+
+                        Test 1 — testValidUrl: new ShortenUrlRequest("https://google.com") → 0 violations
+                        Test 2 — testBlankUrl: new ShortenUrlRequest("") → has violation with "URL cannot be empty"
+                        Test 3 — testInvalidUrl: new ShortenUrlRequest("not-a-url") → has violation with "The provided
+                        URL is not valid"
+
+                        VERIFICATION: "mvn test -Dtest=ShortenUrlRequestTest" — all 3 tests pass.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CHUNK 5 -->
+        <div class="chunk-prompt">
+            <div class="cp-header" onclick="toggle(this)">
+                <div class="cp-num">5</div>
+                <div class="cp-title">Exception Classes</div>
+                <span class="cp-arrow">▶</span>
+            </div>
+            <div class="cp-body">
+                <div class="prompt-box">
+                    <button class="copy-btn" onclick="copyText(this)">Copy</button>
+                    <div class="prompt-text">I am building a URL Shortener with Java 17 + Spring Boot 3.x, package base
+                        com.urlshortener.
+
+                        TASK: Create 3 custom runtime exception classes. These are simple POJOs, no tests needed.
+
+                        1. Create src/main/java/com/urlshortener/exception/UrlNotFoundException.java:
+                        - Extends RuntimeException
+                        - Constructor takes String shortCode
+                        - Passes message to super: "Short link not found: " + shortCode
+                        - Add a getter for shortCode field
+
+                        2. Create src/main/java/com/urlshortener/exception/InvalidUrlException.java:
+                        - Extends RuntimeException
+                        - Constructor takes String message
+                        - Passes message to super()
+
+                        3. Create src/main/java/com/urlshortener/exception/ShortCodeCollisionException.java:
+                        - Extends RuntimeException
+                        - Constructor takes String message
+                        - Passes message to super()
+
+                        VERIFICATION: "mvn clean compile" — compiles without errors.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CHUNK 6 -->
+        <div class="chunk-prompt">
+            <div class="cp-header" onclick="toggle(this)">
+                <div class="cp-num">6</div>
+                <div class="cp-title">Helper: ShortCodeGenerator</div>
+                <span class="cp-arrow">▶</span>
+            </div>
+            <div class="cp-body">
+                <div class="prompt-box">
+                    <button class="copy-btn" onclick="copyText(this)">Copy</button>
+                    <div class="prompt-text">I am building a URL Shortener with Java 17 + Spring Boot 3.x, package base
+                        com.urlshortener.
+
+                        TASK: Create the ShortCodeGenerator interface (Strategy pattern) and its hash-based
+                        implementation, with unit tests.
+
+                        1. Create src/main/java/com/urlshortener/helper/ShortCodeGenerator.java:
+                        - Interface with single method: String generate(String originalUrl);
+
+                        2. Create src/main/java/com/urlshortener/helper/HashBasedShortCodeGenerator.java:
+                        - @Component annotation
+                        - Implements ShortCodeGenerator
+                        - Private constant: BASE62 = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+                        - Private constant: CODE_LENGTH = 7
+
+                        Implementation of generate(String originalUrl):
+                        a) Concatenate: originalUrl + System.nanoTime() (the nanoTime acts as a salt for uniqueness)
+                        b) Hash with SHA-256:
+                        MessageDigest.getInstance("SHA-256").digest(input.getBytes(StandardCharsets.UTF_8))
+                        c) Take first 8 bytes of hash, convert to long: Math.abs(ByteBuffer.wrap(hash, 0, 8).getLong())
+                        d) Base62 encode: loop while code.length() < CODE_LENGTH, append BASE62.charAt((int)(value %
+                            62)), divide value by 62 e) Return the 7-character code string f) Wrap the checked
+                            NoSuchAlgorithmException in a RuntimeException (SHA-256 is always available) 3. Create
+                            src/test/java/com/urlshortener/helper/HashBasedShortCodeGeneratorTest.java: Test 1 —
+                            testCodeLengthIs7: generate a code, assert length==7 Test 2 — testCodeContainsOnlyBase62:
+                            generate a code, assert it matches regex [0-9A-Za-z]{7} Test 3 —
+                            testConsecutiveCallsProduceDifferentCodes: call generate twice with same URL, assert codes
+                            are different Test 4 — testUniquenessOver10000: generate 10000 codes, put in a Set, assert
+                            set size> 9990 (99.9% unique)
+
+                            VERIFICATION: "mvn test -Dtest=HashBasedShortCodeGeneratorTest" — all 4 tests pass.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CHUNK 7 -->
+        <div class="chunk-prompt">
+            <div class="cp-header" onclick="toggle(this)">
+                <div class="cp-num">7</div>
+                <div class="cp-title">Helper: UrlValidator</div>
+                <span class="cp-arrow">▶</span>
+            </div>
+            <div class="cp-body">
+                <div class="prompt-box">
+                    <button class="copy-btn" onclick="copyText(this)">Copy</button>
+                    <div class="prompt-text">I am building a URL Shortener with Java 17 + Spring Boot 3.x, package base
+                        com.urlshortener. The InvalidUrlException class already exists in com.urlshortener.exception.
+
+                        TASK: Create a URL validation helper and its unit tests.
+
+                        1. Create src/main/java/com/urlshortener/helper/UrlValidator.java:
+                        - @Component annotation
+                        - Public method: void validate(String url) — throws InvalidUrlException if invalid
+                        - Validation logic:
+                        a) If url is null or blank → throw new InvalidUrlException("URL cannot be empty")
+                        b) Try to parse with new URI(url)
+                        c) If uri.getScheme() is null → throw new InvalidUrlException("URL must have a valid scheme
+                        (http/https)")
+                        d) If uri.getHost() is null → throw new InvalidUrlException("URL must have a valid host")
+                        e) Catch URISyntaxException → throw new InvalidUrlException("The provided URL is not valid: " +
+                        url)
+
+                        2. Create src/test/java/com/urlshortener/helper/UrlValidatorTest.java:
+                        - Instantiate UrlValidator directly (no Spring context needed — it's a plain class)
+
+                        Test 1 — testValidHttpsUrl: validate("https://google.com") → no exception thrown (use
+                        assertDoesNotThrow)
+                        Test 2 — testNullUrl: validate(null) → throws InvalidUrlException
+                        Test 3 — testEmptyUrl: validate("") → throws InvalidUrlException
+                        Test 4 — testNoScheme: validate("not-a-url") → throws InvalidUrlException
+                        Test 5 — testMissingScheme: validate("://missing-scheme.com") → throws InvalidUrlException
+                        Test 6 — testComplexValidUrl: validate("https://google.com/search?q=hello&lang=en#top") → no
+                        exception
+
+                        Use assertThrows(InvalidUrlException.class, () -> ...) for negative tests.
+
+                        VERIFICATION: "mvn test -Dtest=UrlValidatorTest" — all 6 tests pass.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CHUNK 8 -->
+        <div class="chunk-prompt">
+            <div class="cp-header" onclick="toggle(this)">
+                <div class="cp-num">8</div>
+                <div class="cp-title">Transformer</div>
+                <span class="cp-arrow">▶</span>
+            </div>
+            <div class="cp-body">
+                <div class="prompt-box">
+                    <button class="copy-btn" onclick="copyText(this)">Copy</button>
+                    <div class="prompt-text">I am building a URL Shortener with Java 17 + Spring Boot 3.x, package base
+                        com.urlshortener. The following already exist:
+                        - Entity: com.urlshortener.entity.UrlMapping (fields: id, shortCode, originalUrl, createdAt,
+                        expiresAt, clickCount)
+                        - DTOs: com.urlshortener.model.request.ShortenUrlRequest (record with String url)
+                        - DTOs: com.urlshortener.model.response.ShortenUrlResponse (record with shortCode, shortUrl,
+                        originalUrl, createdAt)
+
+                        TASK: Create a transformer class that converts between Entity and DTOs, with unit tests.
+
+                        1. Create src/main/java/com/urlshortener/transformer/UrlMappingTransformer.java:
+                        - @Component annotation
+                        - Inject base URL from config: @Value("${app.base-url}") private String baseUrl;
+
+                        Method 1: public ShortenUrlResponse toResponse(UrlMapping entity)
+                        - Returns new ShortenUrlResponse(entity.getShortCode(), baseUrl + "/" + entity.getShortCode(),
+                        entity.getOriginalUrl(), entity.getCreatedAt())
+
+                        Method 2: public UrlMapping toEntity(ShortenUrlRequest request, String shortCode)
+                        - Creates new UrlMapping()
+                        - Sets shortCode and originalUrl from params
+                        - Returns the entity (id, createdAt will be set by JPA)
+
+                        2. Create src/test/java/com/urlshortener/transformer/UrlMappingTransformerTest.java:
+                        - Use ReflectionTestUtils.setField(transformer, "baseUrl", "http://localhost:8080") to inject
+                        the value
+                        - Or instantiate and set via reflection
+
+                        Test 1 — testToEntity: call toEntity with request("https://example.com") and "abc1234"
+                        - Assert entity.getShortCode() equals "abc1234"
+                        - Assert entity.getOriginalUrl() equals "https://example.com"
+                        - Assert entity.getId() is null (not persisted yet)
+
+                        Test 2 — testToResponse: create a UrlMapping manually (set shortCode="abc1234",
+                        originalUrl="https://example.com", createdAt=some fixed time)
+                        - Call toResponse(entity)
+                        - Assert response.shortCode() == "abc1234"
+                        - Assert response.shortUrl() == "http://localhost:8080/abc1234"
+                        - Assert response.originalUrl() == "https://example.com"
+
+                        Test 3 — testToResponseWithDifferentBaseUrl: set baseUrl to "https://short.ly"
+                        - Call toResponse → assert shortUrl == "https://short.ly/abc1234"
+
+                        VERIFICATION: "mvn test -Dtest=UrlMappingTransformerTest" — all 3 tests pass.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CHUNK 9 -->
+        <div class="chunk-prompt">
+            <div class="cp-header" onclick="toggle(this)">
+                <div class="cp-num">9</div>
+                <div class="cp-title">Service Layer (Interface + Implementation)</div>
+                <span class="cp-arrow">▶</span>
+            </div>
+            <div class="cp-body">
+                <div class="prompt-box">
+                    <button class="copy-btn" onclick="copyText(this)">Copy</button>
+                    <div class="prompt-text">I am building a URL Shortener with Java 17 + Spring Boot 3.x, package base
+                        com.urlshortener. The following already exist:
+                        - Repository: UrlMappingRepository with findByShortCode() and existsByShortCode()
+                        - Helper: ShortCodeGenerator interface, HashBasedShortCodeGenerator implementation
+                        - Helper: UrlValidator with validate(String url) that throws InvalidUrlException
+                        - Transformer: UrlMappingTransformer with toEntity() and toResponse()
+                        - Exceptions: UrlNotFoundException, InvalidUrlException, ShortCodeCollisionException
+                        - Models: ShortenUrlRequest, ShortenUrlResponse
+
+                        TASK: Create the service interface and implementation with unit tests using Mockito.
+
+                        1. Create src/main/java/com/urlshortener/service/UrlService.java:
+                        - Interface with:
+                        ShortenUrlResponse shortenUrl(ShortenUrlRequest request);
+                        String getOriginalUrl(String shortCode);
+
+                        2. Create src/main/java/com/urlshortener/service/UrlServiceImpl.java:
+                        - @Service annotation
+                        - Constructor injection (single constructor, no @Autowired needed) of: UrlMappingRepository,
+                        ShortCodeGenerator, UrlMappingTransformer, UrlValidator
+                        - Private constant: MAX_RETRIES = 3
+
+                        shortenUrl(ShortenUrlRequest request):
+                        - @Transactional
+                        - Call urlValidator.validate(request.url())
+                        - Call generateUniqueShortCode(request.url()) to get a unique code
+                        - Call transformer.toEntity(request, shortCode) to create entity
+                        - Call repository.save(entity) to persist
+                        - Call transformer.toResponse(saved) to create response DTO
+                        - Return the response
+
+                        getOriginalUrl(String shortCode):
+                        - @Transactional(readOnly = true)
+                        - Call repository.findByShortCode(shortCode)
+                        - .map(UrlMapping::getOriginalUrl)
+                        - .orElseThrow(() -> new UrlNotFoundException(shortCode))
+
+                        private generateUniqueShortCode(String url):
+                        - Loop MAX_RETRIES times:
+                        - Generate code via shortCodeGenerator.generate(url)
+                        - If !repository.existsByShortCode(code) → return code
+                        - If all retries exhausted → throw new ShortCodeCollisionException("Failed to generate unique
+                        code after " + MAX_RETRIES + " attempts")
+
+                        3. Create src/test/java/com/urlshortener/service/UrlServiceImplTest.java:
+                        - Use @ExtendWith(MockitoExtension.class)
+                        - @Mock: UrlMappingRepository, ShortCodeGenerator, UrlMappingTransformer, UrlValidator
+                        - @InjectMocks: UrlServiceImpl
+
+                        Test 1 — testShortenUrl_HappyPath:
+                        - Mock shortCodeGenerator.generate() → returns "abc1234"
+                        - Mock repository.existsByShortCode("abc1234") → returns false
+                        - Mock transformer.toEntity() → returns a UrlMapping
+                        - Mock repository.save() → returns the saved entity
+                        - Mock transformer.toResponse() → returns a ShortenUrlResponse
+                        - Call service.shortenUrl(new ShortenUrlRequest("https://google.com"))
+                        - Verify all mocks were called, assert response is correct
+
+                        Test 2 — testShortenUrl_InvalidUrl:
+                        - Mock urlValidator.validate() to throw InvalidUrlException
+                        - Assert calling shortenUrl throws InvalidUrlException
+                        - Verify repository.save() was never called
+
+                        Test 3 — testShortenUrl_OneCollisionThenSuccess:
+                        - Mock generate() → returns "col1234" first, then "ok12345" second
+                        - Mock existsByShortCode("col1234") → true, existsByShortCode("ok12345") → false
+                        - Assert shortenUrl succeeds with the second code
+
+                        Test 4 — testShortenUrl_AllCollisions:
+                        - Mock existsByShortCode() → always returns true
+                        - Assert calling shortenUrl throws ShortCodeCollisionException
+
+                        Test 5 — testGetOriginalUrl_Found:
+                        - Mock findByShortCode → returns Optional with UrlMapping
+                        - Assert returns the correct originalUrl string
+
+                        Test 6 — testGetOriginalUrl_NotFound:
+                        - Mock findByShortCode → returns Optional.empty()
+                        - Assert throws UrlNotFoundException
+
+                        VERIFICATION: "mvn test -Dtest=UrlServiceImplTest" — all 6 tests pass.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CHUNK 10 -->
+        <div class="chunk-prompt">
+            <div class="cp-header" onclick="toggle(this)">
+                <div class="cp-num">10</div>
+                <div class="cp-title">Controller</div>
+                <span class="cp-arrow">▶</span>
+            </div>
+            <div class="cp-body">
+                <div class="prompt-box">
+                    <button class="copy-btn" onclick="copyText(this)">Copy</button>
+                    <div class="prompt-text">I am building a URL Shortener with Java 17 + Spring Boot 3.x, package base
+                        com.urlshortener. The following already exist:
+                        - Service: UrlService interface with shortenUrl() and getOriginalUrl()
+                        - Models: ShortenUrlRequest (with @Valid annotations), ShortenUrlResponse, ErrorResponse
+                        - Exceptions: UrlNotFoundException, InvalidUrlException
+
+                        TASK: Create the REST controller and its MockMvc tests.
+
+                        1. Create src/main/java/com/urlshortener/controller/UrlController.java:
+                        - @RestController annotation
+                        - Constructor injection of UrlService
+
+                        Endpoint 1: @PostMapping("/api/shorten")
+                        - Parameter: @Valid @RequestBody ShortenUrlRequest request
+                        - Calls urlService.shortenUrl(request)
+                        - Returns ResponseEntity.status(HttpStatus.CREATED).body(response)
+
+                        Endpoint 2: @GetMapping("/{shortCode}")
+                        - Parameter: @PathVariable String shortCode
+                        - Calls urlService.getOriginalUrl(shortCode)
+                        - Returns ResponseEntity.status(HttpStatus.FOUND).location(URI.create(originalUrl)).build()
+                        - Return type: ResponseEntity&lt;Void&gt;
+
+                        2. Create src/test/java/com/urlshortener/controller/UrlControllerTest.java:
+                        - @WebMvcTest(UrlController.class)
+                        - @MockBean UrlService urlService
+                        - @Autowired MockMvc mockMvc
+
+                        Test 1 — testShortenUrl_Success:
+                        - Mock service.shortenUrl() → returns ShortenUrlResponse("abc1234",
+                        "http://localhost:8080/abc1234", "https://google.com", LocalDateTime.now())
+                        - POST /api/shorten with body {"url":"https://google.com"}
+                        - Assert status 201
+                        - Assert JSON body has shortCode="abc1234"
+
+                        Test 2 — testShortenUrl_EmptyBody:
+                        - POST /api/shorten with body {"url":""}
+                        - Assert status 400
+
+                        Test 3 — testShortenUrl_InvalidUrl:
+                        - POST /api/shorten with body {"url":"not-a-url"}
+                        - Assert status 400
+
+                        Test 4 — testRedirect_Success:
+                        - Mock service.getOriginalUrl("abc1234") → returns "https://google.com"
+                        - GET /abc1234
+                        - Assert status 302
+                        - Assert Location header == "https://google.com"
+
+                        Test 5 — testRedirect_NotFound:
+                        - Mock service.getOriginalUrl() → throws UrlNotFoundException
+                        - GET /nonexistent
+                        - Assert status 404
+
+                        Use MockMvc with perform(), andExpect(), and content().contentType(MediaType.APPLICATION_JSON).
+
+                        VERIFICATION: "mvn test -Dtest=UrlControllerTest" — all 5 tests pass.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CHUNK 11 -->
+        <div class="chunk-prompt">
+            <div class="cp-header" onclick="toggle(this)">
+                <div class="cp-num">11</div>
+                <div class="cp-title">GlobalExceptionHandler</div>
+                <span class="cp-arrow">▶</span>
+            </div>
+            <div class="cp-body">
+                <div class="prompt-box">
+                    <button class="copy-btn" onclick="copyText(this)">Copy</button>
+                    <div class="prompt-text">I am building a URL Shortener with Java 17 + Spring Boot 3.x, package base
+                        com.urlshortener. The following already exist:
+                        - Exceptions: InvalidUrlException, UrlNotFoundException, ShortCodeCollisionException
+                        - Model: ErrorResponse (record with String error, String message, int status)
+                        - Controller: UrlController with POST /api/shorten and GET /{shortCode}
+                        - Test: UrlControllerTest.java (already has 5 tests)
+
+                        TASK: Create a centralized exception handler and add 2 more tests to verify error response
+                        bodies.
+
+                        1. Create src/main/java/com/urlshortener/controller/GlobalExceptionHandler.java:
+                        - @RestControllerAdvice annotation
+                        - Add a private static final Logger (SLF4J)
+
+                        Handler 1: @ExceptionHandler(InvalidUrlException.class)
+                        - Returns ResponseEntity&lt;ErrorResponse&gt;
+                        - Status 400, body: new ErrorResponse("INVALID_URL", ex.getMessage(), 400)
+
+                        Handler 2: @ExceptionHandler(MethodArgumentNotValidException.class)
+                        - Extract first field error message:
+                        ex.getBindingResult().getFieldErrors().stream().map(FieldError::getDefaultMessage).findFirst().orElse("Validation
+                        failed")
+                        - Status 400, body: new ErrorResponse("INVALID_URL", message, 400)
+
+                        Handler 3: @ExceptionHandler(UrlNotFoundException.class)
+                        - Status 404, body: new ErrorResponse("NOT_FOUND", "Short link not found.", 404)
+
+                        Handler 4: @ExceptionHandler(Exception.class)
+                        - Log the exception: log.error("Unexpected error", ex)
+                        - Status 500, body: new ErrorResponse("INTERNAL_ERROR", "Something went wrong.", 500)
+                        - NEVER leak stack traces to the client
+
+                        2. Add 2 tests to UrlControllerTest.java (or create new ones that verify the error body format):
+
+                        Test — testInvalidUrl_ErrorResponseBody:
+                        - POST /api/shorten with {"url":"not-a-url"}
+                        - Assert status 400
+                        - Assert jsonPath("$.error").value("INVALID_URL")
+                        - Assert jsonPath("$.status").value(400)
+
+                        Test — testNotFound_ErrorResponseBody:
+                        - Mock service to throw UrlNotFoundException
+                        - GET /nonexistent
+                        - Assert status 404
+                        - Assert jsonPath("$.error").value("NOT_FOUND")
+                        - Assert jsonPath("$.message").value("Short link not found.")
+
+                        VERIFICATION: "mvn test -Dtest=UrlControllerTest" — all 7 tests pass (5 original + 2 new).</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CHUNK 12 -->
+        <div class="chunk-prompt">
+            <div class="cp-header" onclick="toggle(this)">
+                <div class="cp-num">12</div>
+                <div class="cp-title">Integration Test (End-to-End)</div>
+                <span class="cp-arrow">▶</span>
+            </div>
+            <div class="cp-body">
+                <div class="prompt-box">
+                    <button class="copy-btn" onclick="copyText(this)">Copy</button>
+                    <div class="prompt-text">I am building a URL Shortener with Java 17 + Spring Boot 3.x. All layers
+                        are implemented: Controller, Service, ServiceImpl, Helpers, Transformer, Repository, Entity,
+                        Models, Exceptions, GlobalExceptionHandler.
+
+                        TASK: Create an integration test that boots the entire Spring context and tests the full request
+                        flow end-to-end.
+
+                        1. Create src/test/java/com/urlshortener/UrlShortenerIntegrationTest.java:
+                        - @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+                        - Use H2 in-memory database for tests (add @AutoConfigureTestDatabase or test profile with H2)
+                        - @Autowired TestRestTemplate restTemplate
+
+                        Test 1 — testShortenAndRedirect_RoundTrip:
+                        - POST /api/shorten with body {"url":"https://www.google.com"}
+                        - Assert response status is 201
+                        - Extract shortCode from the response body
+                        - Assert shortCode is not null and has length 7
+                        - GET /{shortCode} — use restTemplate.getForEntity with redirects DISABLED
+                        (configure RestTemplate to NOT follow redirects so we can check the 302)
+                        - Assert response status is 302
+                        - Assert Location header equals "https://www.google.com"
+
+                        Test 2 — testShortenUrl_InvalidUrl:
+                        - POST /api/shorten with body {"url":"not-a-valid-url"}
+                        - Assert response status is 400
+                        - Assert response body contains "error":"INVALID_URL"
+
+                        Test 3 — testRedirect_NotFound:
+                        - GET /nonexistentcode
+                        - Assert response status is 404
+                        - Assert response body contains "error":"NOT_FOUND"
+
+                        IMPORTANT: For test 1, you need a RestTemplate that does NOT follow redirects. Use:
+                        HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
+                        factory.setHttpClient(HttpClientBuilder.create().disableRedirectHandling().build());
+                        Or use MockMvc instead of TestRestTemplate for redirect tests.
+
+                        VERIFICATION: "mvn verify" — all 3 integration tests pass.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CHUNK 13 -->
+        <div class="chunk-prompt">
+            <div class="cp-header" onclick="toggle(this)">
+                <div class="cp-num">13</div>
+                <div class="cp-title">Manual Smoke Test & Polish</div>
+                <span class="cp-arrow">▶</span>
+            </div>
+            <div class="cp-body">
+                <div class="prompt-box">
+                    <button class="copy-btn" onclick="copyText(this)">Copy</button>
+                    <div class="prompt-text">I have built the complete URL Shortener with Java 17 + Spring Boot 3.x +
+                        PostgreSQL. All code and tests are in place.
+
+                        TASK: Help me run the manual smoke test to verify everything works end-to-end with a live
+                        server.
+
+                        PRE-REQUISITE: Make sure PostgreSQL is running and the database "urlshortener" exists:
+                        createdb urlshortener (or: psql -c "CREATE DATABASE urlshortener;")
+
+                        STEP 1 — Start the application:
+                        mvn spring-boot:run
+
+                        STEP 2 — Run these 4 curl commands and help me verify the output:
+
+                        Test 1 — Shorten a URL (expect 201 Created):
+                        curl -s -X POST http://localhost:8080/api/shorten \
+                        -H "Content-Type: application/json" \
+                        -d '{"url":"https://www.google.com"}' | python3 -m json.tool
+
+                        Expected: JSON with shortCode (7 chars), shortUrl, originalUrl, createdAt
+
+                        Test 2 — Redirect (expect 302 Found):
+                        curl -s -o /dev/null -w "%{http_code} %{redirect_url}"
+                        http://localhost:8080/{PASTE_SHORT_CODE_HERE}
+
+                        Expected: "302 https://www.google.com"
+
+                        Test 3 — Invalid URL (expect 400):
+                        curl -s -X POST http://localhost:8080/api/shorten \
+                        -H "Content-Type: application/json" \
+                        -d '{"url":"not-a-url"}' | python3 -m json.tool
+
+                        Expected: {"error": "INVALID_URL", "message": "...", "status": 400}
+
+                        Test 4 — Unknown code (expect 404):
+                        curl -s http://localhost:8080/doesnotexist | python3 -m json.tool
+
+                        Expected: {"error": "NOT_FOUND", "message": "Short link not found.", "status": 404}
+
+                        STEP 3 — Check application logs for:
+                        - INFO log when URL is shortened
+                        - INFO log when redirect happens
+                        - WARN log if invalid URL is submitted
+
+                        If all 4 tests pass, the P0 MVP is complete!</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function toggle(header) {
+            const body = header.nextElementSibling;
+            const arrow = header.querySelector('.cp-arrow');
+            body.classList.toggle('open');
+            arrow.textContent = body.classList.contains('open') ? '▼' : '▶';
+        }
+        function copyText(btn) {
+            const text = btn.nextElementSibling.textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                btn.textContent = 'Copied!';
+                btn.classList.add('copied');
+                setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+            });
+        }
+    </script>
+</body>
+
+</html>
